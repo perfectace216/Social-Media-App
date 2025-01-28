@@ -1,8 +1,8 @@
 import { validateRequest } from "@/auth";
 import FollowButton from "@/components/FollowButton";
 import FollowerCount from "@/components/FollowerCount";
-import TrendsSlidebar from "@/components/TrendsSlidebar";
-import { Button } from "@/components/ui/button";
+import Linkify from "@/components/Linkify";
+
 import UserAvatar from "@/components/UserAvatar";
 import prisma from "@/lib/prisma";
 import { followerInfo, getUserDataSelect, UserData } from "@/lib/types";
@@ -11,11 +11,11 @@ import { formatDate } from "date-fns";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import UserPosts from "./UserPosts";
-import Linkify from "@/components/Linkify";
 import EditProfileButton from "./EditProfileButton";
+import UserPosts from "./UserPosts";
+import TrendsSlidebar from "@/components/TrendsSlidebar";
 
-interface pageProps {
+interface PageProps {
   params: { username: string };
 }
 
@@ -35,26 +35,27 @@ const getUser = cache(async (username: string, loggedInUserId: string) => {
   return user;
 });
 
-export async function generateMetaData({
+export async function generateMetadata({
   params: { username },
-}: pageProps): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const { user: loggedInUser } = await validateRequest();
 
   if (!loggedInUser) return {};
 
   const user = await getUser(username, loggedInUser.id);
+
   return {
     title: `${user.displayName} (@${user.username})`,
   };
 }
 
-export default async function page({ params: { username } }: pageProps) {
+export default async function Page({ params: { username } }: PageProps) {
   const { user: loggedInUser } = await validateRequest();
 
   if (!loggedInUser) {
     return (
       <p className="text-destructive">
-        you&apos;re not authorized to view this page
+        You&apos;re not authorized to view this page.
       </p>
     );
   }
@@ -103,7 +104,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
             <h1 className="text-3xl font-bold">{user.displayName}</h1>
             <div className="text-muted-foreground">@{user.username}</div>
           </div>
-          <div>Member since {formatDate(user.createdAt, "MMM d, yyyy")} </div>
+          <div>Member since {formatDate(user.createdAt, "MMM d, yyyy")}</div>
           <div className="flex items-center gap-3">
             <span>
               Posts:{" "}
